@@ -9,7 +9,11 @@
     "core:default",
     "opener:default",
     "dialog:default",
+    "log:default",
     "fs:default",
-    "log:default"
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$Home/*" }]
+    }
   ]
 }

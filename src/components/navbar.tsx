@@ -13,10 +13,31 @@ function Navbar(){
     const [folderEntries, setFolderEntries] = useState<FileMetaData[]>([]);
 
     useEffect(() => {
-        if (folderPath) {
-            getFolderEntries(folderPath, setFolderEntries);
-        }
+        let isMounted = true;
+        
+        // Runs forever constantly checking for any file changes
+        // Surely there's a better way to do this but I can't figure it out
+        const tick = () => {
+            if (!isMounted) return;
+            if (folderPath) {
+                getFolderEntries(folderPath, setFolderEntries);
+            }
+            setTimeout(tick, 500); // call itself after 500 ms
+        };
+
+        tick();
+
+        return () => {
+            isMounted = false; // stop on unmount
+        };
     }, [folderPath]);
+
+
+    // useEffect(() => {
+    //     if (folderPath) {
+    //         getFolderEntries(folderPath, setFolderEntries);
+    //     }
+    // }, [folderPath]);
 
     function toggleNav(){
         setNavVisible(!navVisible)
