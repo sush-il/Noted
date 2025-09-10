@@ -6,15 +6,25 @@ import SelectDatabase from '../assets/selectDatabase';
 import { FileMetaData, getFolderEntries, pickFolder } from './util/io';
 import { warn } from '@tauri-apps/plugin-log';
 import MDFileExtensionIcon from '../assets/mdFileExt';
+import { getLastOpenedDirectoryPath } from './util/store';
 
 function Navbar(){
     const [navVisible, setNavVisible] = useState(false);
     const [folderPath, setFolderPath] = useState("");
     const [folderEntries, setFolderEntries] = useState<FileMetaData[]>([]);
+    
+    useEffect(() => {
+        async function loadSavedPath() {
+            const savedPath = await getLastOpenedDirectoryPath();
+            if (savedPath) {
+                setFolderPath(savedPath);
+            }
+        }
+        loadSavedPath();
+    }, []);
 
     useEffect(() => {
         let isMounted = true;
-        
         // Runs forever constantly checking for any file changes
         // Surely there's a better way to do this but I can't figure it out
         const tick = () => {
@@ -26,18 +36,9 @@ function Navbar(){
         };
 
         tick();
+        return () => { isMounted = false; };
 
-        return () => {
-            isMounted = false; // stop on unmount
-        };
     }, [folderPath]);
-
-
-    // useEffect(() => {
-    //     if (folderPath) {
-    //         getFolderEntries(folderPath, setFolderEntries);
-    //     }
-    // }, [folderPath]);
 
     function toggleNav(){
         setNavVisible(!navVisible)

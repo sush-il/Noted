@@ -11,9 +11,18 @@
     "dialog:default",
     "log:default",
     "fs:default",
+    "fs:allow-home-read-recursive",
+    "fs:allow-home-write-recursive",
+    "fs:allow-home-read",
+    "fs:allow-home-write",
     {
       "identifier": "fs:allow-exists",
-      "allow": [{ "path": "$Home/*" }]
-    }
+      "allow": [
+        {
+          "path": "$HOME/*"
+        }
+      ]
+    },
+    "store:default"
   ]
 }
