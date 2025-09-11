@@ -4,9 +4,9 @@ import NewNoteIcon from '../assets/newNote'
 import NewFolderIcon from '../assets/newFolder';
 import SelectDatabase from '../assets/selectDatabase';
 import { FileMetaData, getFolderEntries, pickFolder } from './util/io';
-import { warn } from '@tauri-apps/plugin-log';
 import MDFileExtensionIcon from '../assets/mdFileExt';
 import { getLastOpenedDirectoryPath } from './util/store';
+import DropdownIcon from '../assets/mdFileExt copy';
 
 function Navbar(){
     const [navVisible, setNavVisible] = useState(false);
@@ -75,31 +75,30 @@ function Navbar(){
                     </span>
                     <button onClick={() => { pickFolder(setFolderPath) }} className="cursor-pointer p-2 relative inline-flex items-center justify-center overflow-hidden text-sm font-medium">
                        <p> {folderPath ? folderPath.split("/").pop() : "Select folder"} </p>
-                       {/* <p> {folderPath} </p> */}
                     </button>
                 </div>
 
 
                 <div className="flex flex-col p-4">
                     { folderEntries.map((entry, idx) => (
-                        <div key={idx} className="flex flex-row justify-start p-2">
-                            {!entry.isDirectory ? 
+                        <div key={idx} className="flex flex-row justify-start items-center">
+                            {entry.isDirectory ? 
                                 (
-                                    <>
-                                        <MDFileExtensionIcon />
-                                        <a className="text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium" >
+                                    <div className="flex flex-row items-center">
+                                        <DropdownIcon size={16} />
+                                        <a className="text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium">
                                             {entry.name}
                                         </a>
-                                    </> 
+                                    </div>
                                 ) : 
                                 
                                 (
-                                    <>
-                                        <MDFileExtensionIcon />
-                                        <a className="text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium" >
+                                    <div className="flex flex-row items-center">
+                                        <MDFileExtensionIcon size={16} />
+                                        <a className="mt-2 text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium" >
                                             {entry.name}
                                         </a>
-                                    </> 
+                                    </div> 
                                 )
                             }
                         </div>

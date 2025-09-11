@@ -1,6 +1,11 @@
-function MDFileExtensionIcon() {
+interface IconProps {
+  color?: string;
+  size?: number; 
+}
+
+function MDFileExtensionIcon({ color = '#f66151', size = 24 }: IconProps) {
     return (
-        <svg fill="#f66151" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <svg fill={color} width={size} height={size} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 
             <g id="SVGRepo_bgCarrier" stroke-width="0"/>
             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
