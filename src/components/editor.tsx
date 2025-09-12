@@ -3,7 +3,7 @@ import { Crepe } from "@milkdown/crepe";
 import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame-dark.css";
 import { warn } from "@tauri-apps/plugin-log";
-import { writeFileContent } from "./util/io";
+import { writeFileContent } from "../util/io";
 import { fileDetailProp } from "../App";
 
 export default function Editor({ file }: { file: fileDetailProp }) {

@@ -1,13 +1,8 @@
 import { useState } from "preact/hooks";
+import { fileDetailProp } from "./util/dataTypes";
 import "./App.css";
 import Editor from "./components/editor";
 import Navbar from "./components/navbar";
-
-export interface fileDetailProp {
-    path: string,
-    folderPath: string,
-    content: string
-}
 
 function App() {
   const [selectedFile, setFileDetails] = useState<fileDetailProp>({path: "", folderPath: "", content: ""});

@@ -1,6 +1,4 @@
 import { LazyStore } from '@tauri-apps/plugin-store';
-import { warn, debug, error } from '@tauri-apps/plugin-log';
-
 
 const store = new LazyStore('settings.json') 
 

@@ -1,7 +1,4 @@
-interface IconProps {
-  color?: string;
-  size?: number; 
-}
+import { IconProps } from '../util/dataTypes';
 
 function SelectDatabase ({ color = '#ffffff', size = 24 }: IconProps) {
   return (

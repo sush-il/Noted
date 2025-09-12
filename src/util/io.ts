@@ -1,15 +1,8 @@
 import { open } from '@tauri-apps/plugin-dialog';
-import { create, readTextFile, writeTextFile, readDir, BaseDirectory } from '@tauri-apps/plugin-fs';
+import { create, readTextFile, writeTextFile, readDir } from '@tauri-apps/plugin-fs';
 import { warn, debug, error } from '@tauri-apps/plugin-log';
 import { saveOpenDirectory } from './store';
-
-
-export type FileMetaData = {
-  name: string;
-  filePath: string;
-  isFile: boolean;
-  isDirectory: boolean;
-};
+import { FileMetaData } from './dataTypes';
 
 export async function pickFolder(setFolderPath: (path: string) => void) {
     const selected = await open({
@@ -28,9 +21,9 @@ export async function pickFolder(setFolderPath: (path: string) => void) {
 
 export async function getFolderEntries( folderPath: string, setFolderEntries: (entries: FileMetaData[]) => void) {
   try {
-    const response = await readDir(folderPath, {baseDir: BaseDirectory.Home});
+    const response = await readDir(folderPath);
     
-    const mdFilesOnly: FileMetaData[] = response.filter(entry =>
+    const mdFilesOnly = response.filter(entry =>
       entry.name?.toLowerCase().endsWith(".md") ||
       (entry.isDirectory && !entry.name?.toLowerCase().startsWith("."))
     ).map((entry) => ({

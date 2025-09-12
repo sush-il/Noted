@@ -1,7 +1,4 @@
-interface IconProps {
-  color?: string;
-  size?: number; 
-}
+import { IconProps } from '../util/dataTypes';
 
 function MDFileExtensionIcon({ color = '#f66151', size = 24 }: IconProps) {
     return (

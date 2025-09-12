@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'preact/hooks'
+import { fileDetailProp } from '../App';
+import { FileMetaData } from '../util/dataTypes';
+import { warn, debug, error } from '@tauri-apps/plugin-log';
+import { createNewFile, getFolderEntries, pickFolder, readFileContent } from '../util/io';
+import { getLastOpenedDirectoryPath, getLastOpenedFilePath, saveLastOpenedFilePath } from '../util/store';
 import BurgerMenu from '../assets/burgerMenu';
 import NewNoteIcon from '../assets/newNote'
 import NewFolderIcon from '../assets/newFolder';
 import SelectDatabase from '../assets/selectDatabase';
-import { createNewFile, FileMetaData, getFolderEntries, pickFolder, readFileContent } from './util/io';
 import MDFileExtensionIcon from '../assets/mdFileExt';
-import { getLastOpenedDirectoryPath, getLastOpenedFilePath, saveLastOpenedFilePath } from './util/store';
-import DropdownIcon from '../assets/mdFileExt copy';
-import { warn, debug, error } from '@tauri-apps/plugin-log';
-import { fileDetailProp } from '../App';
+import DropdownIcon from '../assets/dropdown';
 
 interface Props {
   setFileDetails: (val: fileDetailProp) => void;
