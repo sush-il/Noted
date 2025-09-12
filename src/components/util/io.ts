@@ -1,7 +1,8 @@
 import { open } from '@tauri-apps/plugin-dialog';
-import { readDir, BaseDirectory } from '@tauri-apps/plugin-fs';
+import { readTextFile, writeTextFile, readDir, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { warn, debug, error } from '@tauri-apps/plugin-log';
 import { saveOpenDirectory } from './store';
+
 
 export type FileMetaData = {
   name: string;
@@ -43,4 +44,13 @@ export async function getFolderEntries( folderPath: string, setFolderEntries: (e
   } catch (err) {
     warn("Error in getFolderEntries: " + (err instanceof Error ? err.message : String(err)));
   }
+}
+
+export async function readFileContent(filePath: string){
+  const fileContent = await readTextFile(filePath);
+  return fileContent;
+}
+
+export async function writeFileContent(filePath: string, content: string) {
+  await writeTextFile(filePath, content);
 }

@@ -1,33 +1,38 @@
 import { useEffect, useRef } from "preact/hooks";
 import { Crepe } from "@milkdown/crepe";
 import "@milkdown/crepe/theme/common/style.css";
-import "@milkdown/crepe/theme/frame.css";
+import "@milkdown/crepe/theme/frame-dark.css";
+import { warn } from "@tauri-apps/plugin-log";
+import { writeFileContent } from "./util/io";
+import { fileDetailProp } from "../App";
 
-
-const AUTOSAVE_KEY = "markdown-content";
-
-export default function Editor() {
+export default function Editor({ file }: { file: fileDetailProp }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const crepeRef = useRef<Crepe | null>(null);
 
-  useEffect(() => {
-    if (editorRef.current) {
-      const crepe = new Crepe({
-        root: editorRef.current,
-        defaultValue: localStorage.getItem(AUTOSAVE_KEY) ||"",
-        // onChange: (val: string) => {
-        //   localStorage.setItem(AUTOSAVE_KEY, val);
-        // },
+  const crepe = new Crepe({
+    root: editorRef.current,
+    defaultValue: file.content,
+  });
+
+  crepe.create();
+  crepeRef.current = crepe;
+  
+ useEffect(() => {
+    crepe.on((listener) => {
+      listener.markdownUpdated(() => {
+        const markdown = crepe.getMarkdown();
+        writeFileContent(file.path, markdown);
       });
+    });
 
-      crepe.create();
-      crepeRef.current = crepe;
-
-      return () => {
-        crepe.destroy();
-      };
+    return () => {
+      crepe.destroy();
+      crepeRef.current = null;
     }
-  }, []);
+
+  }, [file.content]);
+
 
   return (
     <div
@@ -35,10 +40,8 @@ export default function Editor() {
         className="
           [&>.milkdown]:min-h-[100vh]
           [&_.editor]:min-h-[100vh] 
-        [&_.editor]:dark:bg-gray-800 
-        [&_.ProseMirror]:dark:text-gray-100
-
-         overflow-auto w-full rounded-xl shadow-sm"
+        [&_.editor]:dark:bg-gray-900 
+          overflow-auto w-full"
     />
   );
 }

@@ -3,15 +3,35 @@ import BurgerMenu from '../assets/burgerMenu';
 import NewNoteIcon from '../assets/newNote'
 import NewFolderIcon from '../assets/newFolder';
 import SelectDatabase from '../assets/selectDatabase';
-import { FileMetaData, getFolderEntries, pickFolder } from './util/io';
+import { FileMetaData, getFolderEntries, pickFolder, readFileContent } from './util/io';
 import MDFileExtensionIcon from '../assets/mdFileExt';
 import { getLastOpenedDirectoryPath } from './util/store';
 import DropdownIcon from '../assets/mdFileExt copy';
+import { warn, debug, error } from '@tauri-apps/plugin-log';
+import { fileDetailProp } from '../App';
 
-function Navbar(){
+interface Props {
+  setFileDetails: (val: fileDetailProp) => void;
+}
+
+function Navbar({ setFileDetails }: Props){
     const [navVisible, setNavVisible] = useState(false);
     const [folderPath, setFolderPath] = useState("");
     const [folderEntries, setFolderEntries] = useState<FileMetaData[]>([]);
+
+    const handleFileLoad = async (path: string) => {
+        try {
+            const content = await readFileContent(path);
+            const fileDetails = {
+                content,
+                folderPath,
+                path
+            }
+            setFileDetails(fileDetails); 
+        } catch (e) {
+            console.error("Failed to read file:", e);
+        }
+    };
     
     useEffect(() => {
         async function loadSavedPath() {
@@ -95,9 +115,9 @@ function Navbar(){
                                 (
                                     <div className="flex flex-row items-center">
                                         <MDFileExtensionIcon size={16} />
-                                        <a className="mt-2 text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium" >
+                                        <button onClick={() => handleFileLoad(entry.filePath)} className="cursor-pointer mt-2 text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium" >
                                             {entry.name}
-                                        </a>
+                                        </button>
                                     </div> 
                                 )
                             }
