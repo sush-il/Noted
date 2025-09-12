@@ -14,3 +14,13 @@ export async function getLastOpenedDirectoryPath(){
     return val;
 }
 
+export async function saveLastOpenedFilePath(filePath: string) {
+    await store.set('lastOpenedFilePath', filePath);
+    await store.save();
+}
+
+export async function getLastOpenedFilePath(){
+    const val = await store.get<string>('lastOpenedFilePath');
+    return val;
+}
+

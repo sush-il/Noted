@@ -1,5 +1,5 @@
 import { open } from '@tauri-apps/plugin-dialog';
-import { readTextFile, writeTextFile, readDir, BaseDirectory } from '@tauri-apps/plugin-fs';
+import { create, readTextFile, writeTextFile, readDir, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { warn, debug, error } from '@tauri-apps/plugin-log';
 import { saveOpenDirectory } from './store';
 
@@ -21,7 +21,7 @@ export async function pickFolder(setFolderPath: (path: string) => void) {
         setFolderPath(selected);
         await saveOpenDirectory(selected);
     } else {
-        warn('Unable to set path for the selected directory')
+        error('Unable to set path for the selected directory')
     }
 
 }
@@ -42,15 +42,33 @@ export async function getFolderEntries( folderPath: string, setFolderEntries: (e
 
     setFolderEntries(mdFilesOnly);
   } catch (err) {
-    warn("Error in getFolderEntries: " + (err instanceof Error ? err.message : String(err)));
+    error("Error in getFolderEntries: " + (err instanceof Error ? err.message : String(err)));
   }
 }
 
 export async function readFileContent(filePath: string){
-  const fileContent = await readTextFile(filePath);
-  return fileContent;
+  try {
+    const fileContent = await readTextFile(filePath);
+    return fileContent;
+  } catch (err) {
+    error("Error reading file: " + (err instanceof Error ? err.message : String(err)));
+  }
+
 }
 
 export async function writeFileContent(filePath: string, content: string) {
-  await writeTextFile(filePath, content);
+  try {
+    await writeTextFile(filePath, content);
+  } catch (err) {
+    error("Error writing file: " + (err instanceof Error ? err.message : String(err)));
+  }
+}
+
+export async function createNewFile(path:string) {
+  try {
+    await create(path);
+  } catch (err) {
+    error("Error creating file: " + (err instanceof Error ? err.message : String(err)));
+    throw err;
+  }
 }

@@ -2,7 +2,6 @@ import { useState } from "preact/hooks";
 import "./App.css";
 import Editor from "./components/editor";
 import Navbar from "./components/navbar";
-import { warn, debug, error } from '@tauri-apps/plugin-log';
 
 export interface fileDetailProp {
     path: string,

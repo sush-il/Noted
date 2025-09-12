@@ -3,9 +3,9 @@ import BurgerMenu from '../assets/burgerMenu';
 import NewNoteIcon from '../assets/newNote'
 import NewFolderIcon from '../assets/newFolder';
 import SelectDatabase from '../assets/selectDatabase';
-import { FileMetaData, getFolderEntries, pickFolder, readFileContent } from './util/io';
+import { createNewFile, FileMetaData, getFolderEntries, pickFolder, readFileContent } from './util/io';
 import MDFileExtensionIcon from '../assets/mdFileExt';
-import { getLastOpenedDirectoryPath } from './util/store';
+import { getLastOpenedDirectoryPath, getLastOpenedFilePath, saveLastOpenedFilePath } from './util/store';
 import DropdownIcon from '../assets/mdFileExt copy';
 import { warn, debug, error } from '@tauri-apps/plugin-log';
 import { fileDetailProp } from '../App';
@@ -18,29 +18,23 @@ function Navbar({ setFileDetails }: Props){
     const [navVisible, setNavVisible] = useState(false);
     const [folderPath, setFolderPath] = useState("");
     const [folderEntries, setFolderEntries] = useState<FileMetaData[]>([]);
-
-    const handleFileLoad = async (path: string) => {
-        try {
-            const content = await readFileContent(path);
-            const fileDetails = {
-                content,
-                folderPath,
-                path
-            }
-            setFileDetails(fileDetails); 
-        } catch (e) {
-            console.error("Failed to read file:", e);
-        }
-    };
+    const [creating, setCreating] = useState(false);
+    const [newFileName, setNewFileName] = useState("");
     
     useEffect(() => {
-        async function loadSavedPath() {
-            const savedPath = await getLastOpenedDirectoryPath();
-            if (savedPath) {
-                setFolderPath(savedPath);
+        async function loadSavedPaths() {
+            const savedDirectoryPath = await getLastOpenedDirectoryPath();
+            const savedFilePath = await getLastOpenedFilePath();
+
+            if (savedDirectoryPath) {
+                setFolderPath(savedDirectoryPath);
+            }
+
+            if (savedFilePath) {
+                handleFileLoad(savedFilePath);
             }
         }
-        loadSavedPath();
+        loadSavedPaths();
     }, []);
 
     useEffect(() => {
@@ -64,6 +58,45 @@ function Navbar({ setFileDetails }: Props){
         setNavVisible(!navVisible)
     }
 
+    const handleFileLoad = async (path: string) => {
+        try {
+            const content = await readFileContent(path);
+            const fileDetails = {
+                content,
+                folderPath,
+                path
+            }
+            setFileDetails(fileDetails); 
+            saveLastOpenedFilePath(path);
+        } catch (e) {
+            console.error("Failed to read file:", e);
+        }
+    };
+
+    const handleCreate = () => {
+        if (!newFileName.trim()) return;
+
+        let finalFileName;
+
+        if (!newFileName.includes(".")) {
+            finalFileName = newFileName + ".md";
+        } else {
+            const ext = newFileName.split(".").pop()?.toLowerCase();
+            if (ext !== "md") {
+                error("Only .md files can be created");
+                return;
+            }
+            finalFileName = newFileName;
+        }
+
+        finalFileName = `${folderPath}/${finalFileName}`;
+        createNewFile(finalFileName);
+
+        // reset state
+        setNewFileName("");
+        setCreating(false);
+    };
+
     return (
         <nav className="flex items-center justify-between p-4 text-white fixed z-10">
             <button 
@@ -82,7 +115,7 @@ function Navbar({ setFileDetails }: Props){
                         </span>
                     </button>
 
-                    <button className="cursor-pointer relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-500 to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800"> 
+                    <button onClick={() => setCreating(true)} className="cursor-pointer relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-500 to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800"> 
                         <span className="w-full relative px-5 py-2.5 transition-all ease-in duration-200 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
                             <NewNoteIcon color='#ffffff' />
                         </span>
@@ -100,29 +133,53 @@ function Navbar({ setFileDetails }: Props){
 
 
                 <div className="flex flex-col p-4">
-                    { folderEntries.map((entry, idx) => (
-                        <div key={idx} className="flex flex-row justify-start items-center">
-                            {entry.isDirectory ? 
-                                (
-                                    <div className="flex flex-row items-center">
-                                        <DropdownIcon size={16} />
-                                        <a className="text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium">
-                                            {entry.name}
-                                        </a>
-                                    </div>
-                                ) : 
-                                
-                                (
-                                    <div className="flex flex-row items-center">
-                                        <MDFileExtensionIcon size={16} />
-                                        <button onClick={() => handleFileLoad(entry.filePath)} className="cursor-pointer mt-2 text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium" >
-                                            {entry.name}
-                                        </button>
-                                    </div> 
-                                )
-                            }
-                        </div>
-                    ))}
+                    {creating && (
+                        <input
+                            autoFocus
+                            type="text"
+                            onChange={(event) => setNewFileName(event.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") handleCreate();
+                                if (e.key === "Escape") {
+                                    setNewFileName("");
+                                    setCreating(false);
+                                }
+                            }}
+                            placeholder="Enter file name..."
+                            className="focused w-full py-2 px-3 text-sm bg-gray-700 text-gray-200 placeholder-gray-400 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200 ease-in-out"
+                        />
+                    )}
+            
+                    { 
+                        folderEntries.sort((a, b) => {
+                            if (a.isDirectory && !b.isDirectory) return -1;
+                            if (!a.isDirectory && b.isDirectory) return 1;
+                            return a.name.localeCompare(b.name, undefined, { numeric: true });
+                        })
+                        .map((entry, idx) => (
+                            <div key={idx} className="flex flex-row justify-start items-center">
+                                {entry.isDirectory ? 
+                                    (
+                                        <div className="flex flex-row items-center">
+                                            <DropdownIcon size={16} />
+                                            <a className="text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium">
+                                                {entry.name}
+                                            </a>
+                                        </div>
+                                    ) : 
+                                    
+                                    (
+                                        <div className="flex flex-row items-center">
+                                            <MDFileExtensionIcon size={16} />
+                                            <button onClick={() => handleFileLoad(entry.filePath)} className="cursor-pointer mt-2 text-gray-200 hover:text-white py-1 px-1 rounded-md font-medium" >
+                                                {entry.name}
+                                            </button>
+                                        </div> 
+                                    )
+                                }
+                            </div>
+                        ))
+                    }
                 </div>
             </div>
         </nav>
