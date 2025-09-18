@@ -2,9 +2,9 @@ import { useEffect, useRef } from "preact/hooks";
 import { Crepe } from "@milkdown/crepe";
 import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame-dark.css";
-import { warn } from "@tauri-apps/plugin-log";
 import { writeFileContent } from "../util/io";
-import { fileDetailProp } from "../App";
+import { fileDetailProp } from "../util/dataTypes";
+// import { warn } from "@tauri-apps/plugin-log";
 
 export default function Editor({ file }: { file: fileDetailProp }) {
   const editorRef = useRef<HTMLDivElement>(null);

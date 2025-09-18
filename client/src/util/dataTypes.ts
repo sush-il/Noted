@@ -1,6 +1,6 @@
 export interface IconProps {
-  color: string;
-  size: number; 
+  color?: string;
+  size?: number; 
 }
 
 export type FileMetaData = {
@@ -12,6 +12,6 @@ export type FileMetaData = {
 
 export interface fileDetailProp {
     path: string,
-    folderPath: string,
-    content: string
+    folderPath?: string,
+    content?: string
 }

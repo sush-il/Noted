@@ -1,6 +1,6 @@
 import { open } from '@tauri-apps/plugin-dialog';
 import { create, readTextFile, writeTextFile, readDir } from '@tauri-apps/plugin-fs';
-import { warn, debug, error } from '@tauri-apps/plugin-log';
+import { error } from '@tauri-apps/plugin-log';
 import { saveOpenDirectory } from './store';
 import { FileMetaData } from './dataTypes';
 

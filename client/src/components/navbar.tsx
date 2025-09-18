@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
-import { fileDetailProp } from '../App';
+import { fileDetailProp } from '../util/dataTypes';
 import { FileMetaData } from '../util/dataTypes';
-import { warn, debug, error } from '@tauri-apps/plugin-log';
 import { createNewFile, getFolderEntries, pickFolder, readFileContent } from '../util/io';
 import { getLastOpenedDirectoryPath, getLastOpenedFilePath, saveLastOpenedFilePath } from '../util/store';
 import BurgerMenu from '../assets/burgerMenu';
@@ -10,6 +9,7 @@ import NewFolderIcon from '../assets/newFolder';
 import SelectDatabase from '../assets/selectDatabase';
 import MDFileExtensionIcon from '../assets/mdFileExt';
 import DropdownIcon from '../assets/dropdown';
+import { error } from '@tauri-apps/plugin-log';
 
 interface Props {
   setFileDetails: (val: fileDetailProp) => void;
@@ -118,7 +118,7 @@ function Navbar({ setFileDetails }: Props){
 
                     <button onClick={() => setCreating(true)} className="cursor-pointer relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-500 to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800"> 
                         <span className="w-full relative px-5 py-2.5 transition-all ease-in duration-200 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
-                            <NewNoteIcon color='#ffffff' />
+                            <NewNoteIcon />
                         </span>
                     </button>
                 </div>
@@ -138,7 +138,7 @@ function Navbar({ setFileDetails }: Props){
                         <input
                             autoFocus
                             type="text"
-                            onChange={(event) => setNewFileName(event.target.value)}
+                            onChange={(event) => setNewFileName(event.currentTarget.value)}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") handleCreate();
                                 if (e.key === "Escape") {
